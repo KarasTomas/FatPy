@@ -11,6 +11,7 @@ class MaterialProperties:
     yield_strength: float
     elastic_modulus: float
     poissons_ratio: float
+    fatigue_strength_coefficient: float
     sheer_modulus: Optional[float] = None
 
     def __post_init__(self) -> None:
