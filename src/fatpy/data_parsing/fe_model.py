@@ -47,3 +47,11 @@ class FEModel:
                 if node_id not in self.node_element_map:
                     self.node_element_map[node_id] = []
                 self.node_element_map[node_id].append(element_id)
+
+    def add_eq_stress(self, eq_stress: NDArray[np.float64]) -> None:
+        """Add equivalent stress to the model.
+
+        Args:
+            eq_stress: Equivalent stress values.
+        """
+        self.stress_tensor = np.column_stack((self.stress_tensor, eq_stress))

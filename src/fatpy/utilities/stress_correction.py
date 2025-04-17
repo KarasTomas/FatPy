@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from numpy.typing import NDArray
 
 from fatpy.data_parsing.material import MaterialProperties
 
@@ -10,8 +11,8 @@ class MeanStressCorrection(ABC):
 
     @abstractmethod
     def correct_eq_stress_amplitude(
-        self, stress_amplitude: float, mean_stress: float, material: MaterialProperties
-    ) -> float:
+        self, stress_amplitude: NDArray[np.float64], mean_stress: NDArray[np.float64], material: MaterialProperties
+    ) -> NDArray[np.float64]:
         """Correct stress amplitude based on selected method.
 
         Args:
@@ -40,9 +41,9 @@ class GoodmanCorrection(MeanStressCorrection):
     - $\\sigma_{UTS}$ is the ultimate tensile strength
     """
 
-    def correct_stress_amplitude(
-        self, stress_amplitude: float, mean_stress: float, material: MaterialProperties
-    ) -> float:
+    def correct_eq_stress_amplitude(
+        self, stress_amplitude: NDArray[np.float64], mean_stress: NDArray[np.float64], material: MaterialProperties
+    ) -> NDArray[np.float64]:
         """Correct stress amplitude based on Goodman mean stress correction.
 
         Args:
@@ -70,9 +71,9 @@ class GerberCorrection(MeanStressCorrection):
     $$ \\sigma_{a,eq} = \\frac{\\sigma_a}{1 - (\\frac{\\sigma_m}{\\sigma_{UTS}})^2} $$
     """
 
-    def correct_stress_amplitude(
-        self, stress_amplitude: float, mean_stress: float, material: MaterialProperties
-    ) -> float:
+    def correct_eq_stress_amplitude(
+        self, stress_amplitude: NDArray[np.float64], mean_stress: NDArray[np.float64], material: MaterialProperties
+    ) -> NDArray[np.float64]:
         """Correct stress amplitude based on Gerber mean stress correction.
 
         Args:
@@ -100,9 +101,9 @@ class SWTCorrection(MeanStressCorrection):
     $$ \\sigma_{a,eq} = \\sqrt{\\sigma_{max} \\cdot \\sigma_a} = \\sqrt{(\\sigma_m + \\sigma_a) \\cdot \\sigma_a} $$
     """
 
-    def correct_stress_amplitude(
-        self, stress_amplitude: float, mean_stress: float, material: MaterialProperties
-    ) -> float:
+    def correct_eq_stress_amplitude(
+        self, stress_amplitude: NDArray[np.float64], mean_stress: NDArray[np.float64], material: MaterialProperties
+    ) -> NDArray[np.float64]:
         """Correct stress amplitude based on SWT mean stress correction.
 
         Args:
@@ -118,7 +119,7 @@ class SWTCorrection(MeanStressCorrection):
         if max_stress <= 0:
             return stress_amplitude
 
-        return float(np.sqrt(max_stress * stress_amplitude))
+        return np.sqrt(max_stress * stress_amplitude)
 
 
 class MorrowCorrection(MeanStressCorrection):
@@ -132,9 +133,9 @@ class MorrowCorrection(MeanStressCorrection):
     where $\\sigma_f'$ is the fatigue strength coefficient.
     """
 
-    def correct_stress_amplitude(
-        self, stress_amplitude: float, mean_stress: float, material: MaterialProperties
-    ) -> float:
+    def correct_eq_stress_amplitude(
+        self, stress_amplitude: NDArray[np.float64], mean_stress: NDArray[np.float64], material: MaterialProperties
+    ) -> NDArray[np.float64]:
         """Correct stress amplitude based on Morrow mean stress correction.
 
         Args:

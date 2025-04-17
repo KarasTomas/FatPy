@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from numpy.typing import NDArray
 
 from fatpy.data_parsing.fe_model import FEModel
 from fatpy.data_parsing.material import MaterialProperties
@@ -17,7 +18,7 @@ class EqStressCriterion(ABC):
         fe_data: FEModel,
         material: MaterialProperties,
         eq_stress_correction: MeanStressCorrection,
-    ) -> float:
+    ) -> NDArray[np.float64]:
         """Calculate equivalent stress based on the selected criterion.
 
         Args:
@@ -47,7 +48,7 @@ class MansonMcKnight(EqStressCriterion):
 
     def calculate_eq_stress(
         self, fe_data: FEModel, material: MaterialProperties, correction: MeanStressCorrection
-    ) -> float:
+    ) -> NDArray[np.float64]:
         """Calculate equivalent stress based on Manson-McKnight criterion.
 
         Args:
@@ -58,14 +59,14 @@ class MansonMcKnight(EqStressCriterion):
             Equivalent stress value.
         """
         # Min and max stress values from FE data
-        min_stress: float = fe_data.stress_tensor.min()
-        max_stress: float = fe_data.stress_tensor.max()
+        min_stress: NDArray[np.float64] = fe_data.stress_tensor.min()
+        max_stress: NDArray[np.float64] = fe_data.stress_tensor.max()
 
-        mean: float = (max_stress + min_stress) / 2
-        amplitude: float = (max_stress - min_stress) / 2
+        mean: NDArray[np.float64] = (max_stress + min_stress) / 2
+        amplitude: NDArray[np.float64] = (max_stress - min_stress) / 2
 
         # dummy calculation
-        sigma_m: float = np.sqrt(mean**2)
-        sigma_a: float = np.sqrt(amplitude**2)
+        sigma_m: NDArray[np.float64] = np.sqrt(mean**2)
+        sigma_a: NDArray[np.float64] = np.sqrt(amplitude**2)
 
-        return float(correction.correct_eq_stress_amplitude(sigma_a, sigma_m, material))
+        return correction.correct_eq_stress_amplitude(sigma_a, sigma_m, material)
