@@ -33,18 +33,13 @@ class StressLifeMethod(ABC):
             load_case: Optional load case data (e.g., for scaling FE stresses).
 
         Returns:
-
+            None: The method modifies the FEModel in place by adding the equivalent stress.
         """
         pass
 
 
 class StressInvariant(StressLifeMethod):
-    """Stress invariant method for fatigue analysis.
-
-    This method calculates the equivalent stress using the stress invariants.
-    It is suitable for complex loading conditions and provides a more accurate
-    representation of the stress state.
-    """
+    """Stress invariant method for fatigue analysis."""
 
     def eq_stress(
         self,
@@ -54,7 +49,7 @@ class StressInvariant(StressLifeMethod):
         eq_stress_correction: MeanStressCorrection,
         load_case: Optional[LoadCase] = None,
     ) -> None:
-        """Calculate equivalent stress based on stress invariants.
+        """Calculate equivalent stress based on selected Criterion and CorrectionMethod.
 
         Args:
             material: Material properties.
@@ -64,10 +59,10 @@ class StressInvariant(StressLifeMethod):
             load_case: Optional load case data (e.g., for scaling FE stresses).
 
         Returns:
-
+            None: The method modifies the FEModel in place by adding the equivalent stress.
         """
         eq_stress: NDArray[np.float64] = eq_stress_criterion.calculate_eq_stress(
             fe_model, material, eq_stress_correction
         )
-        fe_model.add_eq_stress(eq_stress)
+        fe_model.add_stress_column(eq_stress)
         return

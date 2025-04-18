@@ -4,7 +4,7 @@ from typing import Optional
 
 @dataclass
 class MaterialProperties:
-    """Material properties required for stress life analysis."""
+    """Material properties required for fatigue life analysis."""
 
     name: str
     ultimate_tensile_strength: float

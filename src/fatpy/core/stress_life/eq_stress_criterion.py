@@ -8,7 +8,6 @@ from fatpy.data_parsing.material import MaterialProperties
 from fatpy.utilities.stress_correction import MeanStressCorrection
 
 
-@abstractmethod
 class EqStressCriterion(ABC):
     """Abstract base class for equivalent stress criteria."""
 
@@ -20,6 +19,7 @@ class EqStressCriterion(ABC):
         eq_stress_correction: MeanStressCorrection,
     ) -> NDArray[np.float64]:
         """Calculate equivalent stress based on the selected criterion.
+        This may include mean stress correction depending on the selected correction model.
 
         Args:
             fe_data: Finite Element model data containing stresses.
@@ -27,7 +27,7 @@ class EqStressCriterion(ABC):
 
 
         Returns:
-            Equivalent stress value.
+            Equivalent stress field as a NumPy array.
         """
         pass
 
@@ -35,15 +35,19 @@ class EqStressCriterion(ABC):
 class MansonMcKnight(EqStressCriterion):
     """Manson-McKnight equivalent stress criterion.
 
-    This criterion is used for high-cycle fatigue analysis and is based on the
-    equivalent alternating and mean stresses. It is defined as:
+    Computes equivalent stress for high-cycle fatigue using signed von Mises-based
+    mean and amplitude stresses.
 
-    $$ \\sigma_{eq} = \\sqrt{\\sigma_a^2 + \\sigma_m^2} $$
+    $$
+    \sigma_m = \operatorname{SIGN}(\sigma_{xm} + \sigma_{ym} + \sigma_{zm}) \cdot
+    \frac{\sqrt{2}}{2} \cdot \sqrt{(\sigma_{xm} - \sigma_{ym})^2 + (\sigma_{ym} - \sigma_{zm})^2 + (\sigma_{zm} - \sigma_{xm})^2 + 6(\tau_{xym}^2 + \tau_{yzm}^2 + \tau_{zxm}^2)}
+    $$
 
-    where:
-    - $\\sigma_{eq}$ is the equivalent stress
-    - $\\sigma_a$ is the stress amplitude
-    - $\\sigma_m$ is the mean stress
+    $$
+    \sigma_a = \frac{\sqrt{2}}{2} \cdot \sqrt{(\sigma_{xa} - \sigma_{ya})^2 + (\sigma_{ya} - \sigma_{za})^2 + (\sigma_{za} - \sigma_{xa})^2 + 6(\tau_{xya}^2 + \tau_{yza}^2 + \tau_{zxa}^2)}
+    $$
+
+    The equivalent stress is then corrected using the selected mean stress correction model.
     """
 
     def calculate_eq_stress(
@@ -69,4 +73,4 @@ class MansonMcKnight(EqStressCriterion):
         sigma_m: NDArray[np.float64] = np.sqrt(mean**2)
         sigma_a: NDArray[np.float64] = np.sqrt(amplitude**2)
 
-        return correction.correct_eq_stress_amplitude(sigma_a, sigma_m, material)
+        return correction.eq_stress_amplitude(sigma_a, sigma_m, material)

@@ -30,7 +30,6 @@ class FEModel:
     def __post_init__(self) -> None:
         """Validate shapes and compute node-element map."""
 
-        # # --- Validation ---
         # if self.node_coordinates.ndim != 2 or self.node_coordinates.shape[1] != 3:
         #     raise ValueError(f"node_coordinates must have shape (num_nodes, 3), but got {self.node_coordinates.shape}")
 
@@ -48,10 +47,10 @@ class FEModel:
                     self.node_element_map[node_id] = []
                 self.node_element_map[node_id].append(element_id)
 
-    def add_eq_stress(self, eq_stress: NDArray[np.float64]) -> None:
-        """Add equivalent stress to the model.
+    def add_stress_column(self, stress_col: NDArray[np.float64]) -> None:
+        """Add stress column to FE data.
 
         Args:
-            eq_stress: Equivalent stress values.
+            stress_col: Column of stress values.
         """
-        self.stress_tensor = np.column_stack((self.stress_tensor, eq_stress))
+        self.stress_tensor = np.column_stack((self.stress_tensor, stress_col))
