@@ -11,6 +11,8 @@ from fatpy.data_parsing.material import MaterialProperties
 from fatpy.utilities.stress_correction import MeanStressCorrection
 
 
+# TODO:použít popis v jupiter notebooku
+# example: https://github.com/Vybornak2/Training/blob/main/design_patterns/_02_creational_patterns/factory_method.ipynb
 class StressLifeMethod(ABC):
     """Abstract base class for stress-life fatigue analysis methods."""
 

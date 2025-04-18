@@ -18,8 +18,3 @@ repos:
     rev: v1.15.0
     hooks:
       - id: mypy
-
-  - repo: https://github.com/hhatto/autopep8
-    rev: v2.3.2
-    hooks:
-      - id: autopep8
