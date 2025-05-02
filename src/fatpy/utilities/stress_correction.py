@@ -66,6 +66,15 @@ class GoodmanCorrection(MeanStressCorrection):
         return eq_stress
 
 
+def goodman_eq_stress_correction[T: np.floating](
+    stress_amplitude: NDArray[T], mean_stress: NDArray[T], ultimate_tensile_strength: float
+) -> NDArray[T]:
+    eq_stress = np.where(
+        mean_stress <= 0, stress_amplitude, stress_amplitude / (1 - mean_stress / ultimate_tensile_strength)
+    )
+    return eq_stress
+
+
 class GerberCorrection(MeanStressCorrection):
     """Gerber mean stress correction method.
 
@@ -94,6 +103,15 @@ class GerberCorrection(MeanStressCorrection):
             return stress_amplitude
 
         return stress_amplitude / (1 - (mean_stress / material.ultimate_tensile_strength) ** 2)
+
+
+def gerber_eq_stress_correction[T: np.floating](
+    stress_amplitude: NDArray[T], mean_stress: NDArray[T], ultimate_tensile_strength: float
+) -> NDArray[T]:
+    eq_stress = np.where(
+        mean_stress <= 0, stress_amplitude, stress_amplitude / (1 - (mean_stress / ultimate_tensile_strength) ** 2)
+    )
+    return eq_stress
 
 
 class SWTCorrection(MeanStressCorrection):
@@ -126,6 +144,12 @@ class SWTCorrection(MeanStressCorrection):
         return np.sqrt(max_stress * stress_amplitude)
 
 
+def swt_eq_stress_correction[T: np.floating](stress_amplitude: NDArray[T], mean_stress: NDArray[T]) -> NDArray[T]:
+    max_stress = mean_stress + stress_amplitude
+    eq_stress = np.where(max_stress <= 0, stress_amplitude, np.sqrt(max_stress * stress_amplitude))
+    return eq_stress
+
+
 class MorrowCorrection(MeanStressCorrection):
     """Morrow mean stress correction method.
 
@@ -154,3 +178,37 @@ class MorrowCorrection(MeanStressCorrection):
             return stress_amplitude
 
         return stress_amplitude / (1 - mean_stress / material.fatigue_strength_coefficient)
+
+
+def morrow_eq_stress_correction[T: np.floating](
+    stress_amplitude: NDArray[T], mean_stress: NDArray[T], fatigue_strength_coefficient: float
+) -> NDArray[T]:
+    eq_stress = np.where(
+        mean_stress <= 0, stress_amplitude, stress_amplitude / (1 - mean_stress / fatigue_strength_coefficient)
+    )
+    return eq_stress
+
+
+def walker_eq_stress_correction[T: np.floating](
+    stress_amplitude: NDArray[T], mean_stress: NDArray[T], walker_exponent: float
+) -> NDArray[T]:
+    """Walker mean stress correction function.
+
+    Args:
+        stress_amplitude: Stress amplitude
+        mean_stress: Mean stress
+        walker_exponent: Material-specific Walker exponent (γ)
+
+    Returns:
+        Corrected equivalent stress amplitude using Walker's equation
+    """
+    max_stress = mean_stress + stress_amplitude
+
+    # For R calculation, avoid division by zero or negative values
+    eq_stress = np.where(
+        max_stress <= 0,
+        stress_amplitude,  # ? Is This correct?
+        (stress_amplitude + mean_stress) ** (1 - walker_exponent) * (stress_amplitude**walker_exponent),
+    )
+
+    return eq_stress
